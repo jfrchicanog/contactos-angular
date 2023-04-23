@@ -1,34 +1,29 @@
 import { Injectable } from '@angular/core';
 import {Contacto } from './contacto';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContactosService {
-  private contactos: Contacto [] = [
-    {id: 1, nombre: 'Juan', apellidos: 'Pérez', email: 'perez@uma.es', telefono: '666666666'},
-    {id: 2, nombre: 'Ana', apellidos: 'García', email: 'ana@uma.es', telefono: '55555555'},
-    {id: 3, nombre: 'Luis', apellidos: 'González', email: 'gonzalez@uma.es', telefono: '444444444'},
-  ];
+  private baseURI: string = 'http://localhost:8080/api/agenda/contactos';
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  getContactos(): Contacto [] {
-    return this.contactos;
+  getContactos(): Observable<Contacto []> {
+    return this.http.get<Contacto []>(this.baseURI);
   }
 
-  addContacto(contacto: Contacto) {
-    contacto.id = this.contactos.length + 1;
-    this.contactos.push(contacto);
+  addContacto(contacto: Contacto): Observable<Contacto> {
+    return this.http.post<Contacto>(this.baseURI, contacto);
   }
 
-  editarContacto(contacto: Contacto) {
-    let indice = this.contactos.findIndex(c => c.id == contacto.id);
-    this.contactos[indice] = contacto;
+  editarContacto(contacto: Contacto): Observable<Contacto> {
+    return this.http.put<Contacto>(this.baseURI + '/' + contacto.id, contacto);
   }
 
-  eliminarcContacto(id: number) {
-    let indice = this.contactos.findIndex(c => c.id == id);
-    this.contactos.splice(indice, 1);
+  eliminarcContacto(id: number): Observable<HttpResponse<string>> {
+    return this.http.delete(this.baseURI + '/' + id, {observe: "response", responseType: 'text'});
   }
 }
