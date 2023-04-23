@@ -13,7 +13,10 @@ export class AppComponent implements OnInit {
   contactos: Contacto [] = [];
   contactoElegido?: Contacto;
 
-  constructor(private contactosService: ContactosService, private modalService: NgbModal) { }
+  constructor(private contactosService: ContactosService, private modalService: NgbModal) {
+    contactosService.registraOnChangeListener(() =>
+      this.actualizaContactos(this.contactoElegido?.id));
+  }
 
   ngOnInit(): void {
     this.actualizaContactos();
@@ -38,25 +41,18 @@ export class AppComponent implements OnInit {
     ref.componentInstance.accion = "Añadir";
     ref.componentInstance.contacto = {id: 0, nombre: '', apellidos: '', email: '', telefono: ''};
     ref.result.then((contacto: Contacto) => {
-      this.contactosService.addContacto(contacto)
-        .subscribe(c => {
-          this.actualizaContactos();
-        })
-    }, (reason) => {});
+      this.contactosService.addContacto(contacto).subscribe(c => {});
+    }, (reason) => {
+      console.log(reason);
+    });
 
   }
   contactoEditado(contacto: Contacto): void {
-    this.contactosService.editarContacto(contacto)
-      .subscribe(c => {
-        this.actualizaContactos(contacto.id);
-      })
+    this.contactosService.editarContacto(contacto).subscribe(c => {});
   }
 
   eliminarContacto(id: number): void {
-    this.contactosService.eliminarcContacto(id)
-      .subscribe(r => {
-        this.actualizaContactos();
-      });
+    this.contactosService.eliminarcContacto(id).subscribe(c => {});
     this.contactoElegido = undefined;
   }
 }
